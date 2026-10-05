@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  apertus-sovereigngate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: apertus-sovereigngate
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+      - SWISS_SOIL_ENFORCEMENT=true
+      - ZERO_RETENTION_SHREDDER=ctypes_memset
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    security_opt:
+      - no-new-privileges:true

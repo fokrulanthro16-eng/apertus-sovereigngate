@@ -122,7 +122,27 @@ print(response.choices[0].message.content)
 
 ## 🚀 Quickstart & Verification
 
-### 1. Clone & Set Up
+### 🐳 1-Command Sovereign Deployment (Docker)
+
+Deploy inside your private Swiss infrastructure with zero external network dependencies:
+
+```bash
+# 1. Clone repository
+git clone https://github.com/fokrulanthro16-eng/apertus-sovereigngate.git
+cd apertus-sovereigngate
+
+# 2. Boot Sovereign Airlock Gateway
+docker compose up -d --build
+
+# 3. Verify health & zero-retention status
+curl http://localhost:8000/health
+```
+
+---
+
+### 💻 Local Development Setup
+
+#### 1. Clone & Set Up
 ```bash
 git clone https://github.com/fokrulanthro16-eng/apertus-sovereigngate.git
 cd apertus-sovereigngate
