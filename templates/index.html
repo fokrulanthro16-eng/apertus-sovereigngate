@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apertus SovereignGate — Swiss FADP FinTech & GovTech Sovereign AI Airlock</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            swiss: {
+              red: '#D52B1E',
+              darkred: '#9B1D14',
+              alpine: '#0A0F1D',
+            },
+            sovereign: {
+              950: '#070B14',
+              900: '#0A0F1D',
+              850: '#0E1626',
+              800: '#131D31',
+              700: '#1E293B',
+              600: '#334155',
+            }
+          },
+          fontFamily: {
+            mono: ['JetBrains Mono', 'Fira Code', 'Courier New', 'monospace'],
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #070B14;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(213, 43, 30, 0.08) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.06) 0px, transparent 50%);
+    }
+    .glass-panel {
+      background: rgba(14, 22, 38, 0.78);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+    .glass-card {
+      background: rgba(19, 29, 49, 0.55);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+    .badge-pii-amber {
+      background: rgba(245, 158, 11, 0.18);
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      color: #fcd34d;
+    }
+    .badge-pii-green {
+      background: rgba(16, 185, 129, 0.18);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      color: #6ee7b7;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(10, 15, 29, 0.6);
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(71, 85, 105, 0.5);
+      border-radius: 4px;
+    }
+    @keyframes pulse-subtle {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.85; transform: scale(1.02); }
+    }
+    .pulse-glow {
+      animation: pulse-subtle 3s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col font-sans antialiased selection:bg-red-500 selection:text-white">
+
+  <!-- Top Sovereign Header Bar -->
+  <header class="border-b border-white/10 glass-panel sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
+      
+      <!-- Brand & Sovereign Status -->
+      <div class="flex items-center space-x-3">
+        <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-red-600 to-red-800 flex items-center justify-center shadow-lg shadow-red-900/40 border border-red-400/40">
+          <span class="text-white font-bold text-xl leading-none">🇨🇭</span>
+        </div>
+        <div>
+          <div class="flex items-center space-x-2">
+            <h1 class="font-black text-base sm:text-lg text-white tracking-tight flex items-center gap-1.5">
+              <span>Apertus</span>
+              <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-rose-300 to-amber-200">SovereignGate</span>
+            </h1>
+            <span class="text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded-full bg-red-950/90 text-red-300 border border-red-700/60 shadow-sm">
+              Swiss FADP / revDSG Core
+            </span>
+          </div>
+          <p class="text-xs text-slate-400 flex items-center gap-2">
+            <span>Sovereign FinTech & GovTech AI Gateway</span>
+            <span class="text-slate-600">•</span>
+            <span id="headerNodeStatus" class="text-emerald-400 flex items-center gap-1 font-mono text-[11px]">
+              <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+              CSCS Lugano Active
+            </span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Controls in Top Bar -->
+      <div class="flex flex-wrap items-center gap-2.5">
+        
+        <!-- Dynamic Model & Backend Selector -->
+        <div class="flex items-center space-x-2 bg-slate-900/90 border border-slate-700/80 rounded-xl px-2.5 py-1">
+          <i data-lucide="cpu" class="w-4 h-4 text-indigo-400"></i>
+          <label for="selectModel" class="text-xs text-slate-400 font-medium">Model:</label>
+          <select id="selectModel" onchange="onModelChange()" class="text-xs bg-transparent text-slate-100 font-medium focus:outline-none cursor-pointer pr-1">
+            <option value="apertus-70b" class="bg-slate-900 text-slate-100">CSCS Apertus 70B (Primary Sovereign)</option>
+            <option value="apertus-8b" selected class="bg-slate-900 text-slate-100">CSCS Apertus 8B (Fast Sovereign)</option>
+            <option value="hf-fallback" class="bg-slate-900 text-slate-100">Hugging Face Fallback (Router API)</option>
+          </select>
+        </div>
+
+        <!-- Real-Time SSE Stream Toggle -->
+        <label class="flex items-center space-x-1.5 cursor-pointer bg-slate-900/90 px-2.5 py-1.5 rounded-xl border border-slate-700/80 text-xs">
+          <input type="checkbox" id="checkStreaming" checked class="rounded border-slate-700 text-emerald-500 focus:ring-emerald-400 bg-slate-800">
+          <span class="text-slate-300 font-medium flex items-center gap-1">
+            <i data-lucide="radio" class="w-3.5 h-3.5 text-emerald-400"></i> SSE Stream
+          </span>
+        </label>
+
+        <!-- Interactive Code Snippet Drawer Button -->
+        <button onclick="openCodeModal()" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-indigo-300 font-semibold transition flex items-center gap-1.5 shadow-sm">
+          <i data-lucide="terminal" class="w-3.5 h-3.5 text-indigo-400"></i>
+          <span>OpenAI SDK</span>
+        </button>
+
+        <!-- Live Audit Report Button -->
+        <button id="btnOpenAuditModal" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs text-slate-200 font-medium transition flex items-center gap-1.5 shadow-sm">
+          <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5 text-slate-400"></i>
+          <span>Audit Log</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Performance Telemetry & Airlock Latency Gauge Bar -->
+  <section class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-3.5">
+    <div class="glass-panel rounded-xl p-3 border border-white/5 grid grid-cols-1 sm:grid-cols-4 gap-2.5">
+      
+      <!-- Sanitization Overhead Gauge -->
+      <div class="glass-card px-3.5 py-2 rounded-xl flex items-center justify-between">
+        <div class="flex items-center space-x-2.5">
+          <div class="p-2 rounded-lg bg-cyan-950/80 border border-cyan-800/60 text-cyan-400">
+            <i data-lucide="zap" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <div class="text-[9px] uppercase font-bold text-slate-400 tracking-wider">Airlock Overhead</div>
+            <div class="flex items-baseline space-x-1.5">
+              <span id="telemetryLatency" class="text-xs font-mono font-extrabold text-cyan-300">0.08 ms</span>
+              <span id="telemetryMicros" class="text-[10px] font-mono text-slate-400">(80 µs)</span>
+            </div>
+          </div>
+        </div>
+        <span id="telemetryImpactBadge" class="text-[9px] font-semibold px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-800/60">
+          Zero Impact (&lt; 1.5 ms)
+        </span>
+      </div>
+
+      <!-- RAM Memory Shredder Telemetry -->
+      <div class="glass-card px-3.5 py-2 rounded-xl flex items-center justify-between">
+        <div class="flex items-center space-x-2.5">
+          <div class="p-2 rounded-lg bg-emerald-950/80 border border-emerald-800/60 text-emerald-400">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <div class="text-[9px] uppercase font-bold text-slate-400 tracking-wider">RAM Shredder</div>
+            <div class="text-xs font-bold text-emerald-300 flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+              <span>Zeroization: ACTIVE</span>
+            </div>
+          </div>
+        </div>
+        <div class="text-right">
+          <span class="text-[9px] font-mono text-slate-400 block">ctypes.memset</span>
+          <span class="text-[9px] font-mono text-emerald-400 font-bold">0 bytes retained</span>
+        </div>
+      </div>
+
+      <!-- Memory Vault Status -->
+      <div class="glass-card px-3.5 py-2 rounded-xl flex items-center justify-between">
+        <div class="flex items-center space-x-2.5">
+          <div class="p-2 rounded-lg bg-amber-950/80 border border-amber-800/60 text-amber-400">
+            <i data-lucide="lock" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <div class="text-[9px] uppercase font-bold text-slate-400 tracking-wider">Session Vault</div>
+            <div id="telemetryVaultStatus" class="text-xs font-bold text-amber-300">Volatile / Ephemeral</div>
+          </div>
+        </div>
+        <div class="text-right">
+          <span class="text-[9px] font-mono text-slate-400 block">FINMA 2018/3 §4</span>
+          <span class="text-[9px] font-mono text-amber-400 font-bold">HMAC Authenticated</span>
+        </div>
+      </div>
+
+      <!-- Swiss Data Sovereignty Score -->
+      <div class="glass-card px-3.5 py-2 rounded-xl flex items-center justify-between">
+        <div class="flex items-center space-x-2.5">
+          <div class="p-2 rounded-lg bg-red-950/80 border border-red-800/60 text-red-400">
+            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+          </div>
+          <div>
+            <div class="text-[9px] uppercase font-bold text-slate-400 tracking-wider">Swiss Sovereignty</div>
+            <div class="text-xs font-extrabold text-white flex items-center gap-1">
+              <span class="text-emerald-400 font-mono">100% On-Soil</span>
+            </div>
+          </div>
+        </div>
+        <div class="text-right">
+          <span class="text-[9px] font-mono text-slate-300 bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700">
+            CSCS Lugano
+          </span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col gap-4">
+
+    <!-- 3-Pane Realtime Airlock View Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 flex-1 min-h-[580px]">
+
+      <!-- ================= PANE 1: RAW SWISS INPUT ================= -->
+      <div class="glass-panel rounded-2xl flex flex-col overflow-hidden border border-slate-800/80 shadow-xl">
+        <div class="px-4 py-2.5 bg-slate-900/70 border-b border-slate-800 flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <div class="w-2.5 h-2.5 rounded-full bg-blue-500"></div>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-200">1. Client Local Boundary</h2>
+          </div>
+          <span class="text-[10px] font-mono text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded border border-slate-700">
+            Raw Swiss PII Ingest
+          </span>
+        </div>
+
+        <div class="p-3.5 flex-1 flex flex-col justify-between gap-2.5">
+          
+          <!-- One-Click Swiss Industry Presets -->
+          <div class="flex flex-col gap-1.5">
+            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+              <i data-lucide="sparkles" class="w-3 h-3 text-amber-400"></i>
+              <span>One-Click Swiss Industry Presets:</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-1.5">
+              <button onclick="applyIndustryPreset('banking')" class="text-left p-2 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-slate-700 transition group">
+                <div class="flex items-center space-x-1 text-xs font-bold text-slate-200 group-hover:text-red-400">
+                  <span>🏦</span>
+                  <span>Swiss Banking</span>
+                </div>
+                <div class="text-[9px] text-slate-400 font-mono mt-0.5">FINMA • IBAN Wire</div>
+              </button>
+
+              <button onclick="applyIndustryPreset('healthcare')" class="text-left p-2 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-slate-700 transition group">
+                <div class="flex items-center space-x-1 text-xs font-bold text-slate-200 group-hover:text-emerald-400">
+                  <span>🏥</span>
+                  <span>Healthcare</span>
+                </div>
+                <div class="text-[9px] text-slate-400 font-mono mt-0.5">Clinical • AHV Dossier</div>
+              </button>
+
+              <button onclick="applyIndustryPreset('tax')" class="text-left p-2 rounded-xl bg-slate-900/90 hover:bg-slate-800/90 border border-slate-800 hover:border-slate-700 transition group">
+                <div class="flex items-center space-x-1 text-xs font-bold text-slate-200 group-hover:text-blue-400">
+                  <span>📊</span>
+                  <span>Corporate Tax</span>
+                </div>
+                <div class="text-[9px] text-slate-400 font-mono mt-0.5">Kanton ZH • UID MWST</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Input Textarea -->
+          <div class="flex-1 flex flex-col mt-0.5">
+            <label for="inputPrompt" class="text-xs text-slate-400 mb-1 flex items-center justify-between">
+              <span>Confidential Swiss Client Prompt</span>
+              <span class="text-[10px] text-slate-500 font-mono">Art. 6 revDSG</span>
+            </label>
+            <textarea id="inputPrompt" rows="12" class="custom-scrollbar w-full flex-1 bg-slate-950/80 border border-slate-800 rounded-xl p-3 text-xs text-slate-200 font-mono leading-relaxed focus:outline-none focus:border-red-500/60 focus:ring-1 focus:ring-red-500/50 resize-none transition" placeholder="Enter confidential prompt containing Swiss AHV, IBAN, Enterprise UID, clinical names, or cantonal case numbers..."></textarea>
+          </div>
+
+          <!-- Transmit Action Button -->
+          <button id="btnTransmit" onclick="transmitAirlock()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold text-xs tracking-wide shadow-lg shadow-red-900/40 transition flex items-center justify-center gap-2">
+            <i data-lucide="shield" class="w-4 h-4"></i>
+            <span>Transmit Sovereign Airlock</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ================= PANE 2: DUAL-ENGINE SOVEREIGN AIRLOCK ================= -->
+      <div class="glass-panel rounded-2xl flex flex-col overflow-hidden border border-amber-950/60 shadow-xl relative">
+        <div class="px-4 py-2.5 bg-slate-900/70 border-b border-slate-800 flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <div class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></div>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-200">2. Inbound Sanitizer Airlock</h2>
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="text-[9px] font-mono text-emerald-400 bg-emerald-950/80 px-1.5 py-0.5 rounded border border-emerald-800/60 flex items-center gap-1">
+              <span class="w-1 h-1 rounded-full bg-emerald-400 animate-ping"></span> RAM Shredder Active
+            </span>
+            <span id="badgeRedactedCount" class="text-[10px] font-mono text-amber-300 bg-amber-950/80 px-2 py-0.5 rounded border border-amber-800/60">
+              0 Neutralized
+            </span>
+          </div>
+        </div>
+
+        <div class="p-3.5 flex-1 flex flex-col justify-between gap-2.5">
+          
+          <!-- Sanitized Preview with Amber Highlighted Pills -->
+          <div class="flex-1 flex flex-col">
+            <div class="text-xs text-slate-400 mb-1 flex items-center justify-between">
+              <span>Sanitized Transmit Payload (Anonymized)</span>
+              <span class="text-[10px] text-amber-400 font-mono flex items-center gap-1">
+                <i data-lucide="shield-alert" class="w-3 h-3"></i> Deterministic Surrogate Tokens
+              </span>
+            </div>
+            <div id="sanitizedDisplay" class="custom-scrollbar w-full flex-1 bg-slate-950/90 border border-slate-800 rounded-xl p-3 text-xs font-mono leading-relaxed overflow-y-auto text-slate-300 select-text whitespace-pre-wrap">
+              <span class="text-slate-500 italic">Awaiting prompt transmission... Surrogate tokens (&lt;SWISS_AHV_1&gt;, &lt;SWISS_IBAN_1&gt;, &lt;SWISS_CLINICAL_1&gt;) will appear highlighted here in amber.</span>
+            </div>
+          </div>
+
+          <!-- PII Detection Badges Breakdown -->
+          <div class="bg-slate-900/70 rounded-xl p-2.5 border border-slate-800 flex flex-col gap-1.5">
+            <div class="text-[10px] font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
+              <span>Swiss PII & Context Intercepted:</span>
+              <span id="labelTotalRedacted" class="text-slate-400 font-mono text-[10px]">Total: 0</span>
+            </div>
+            <div id="piiBadgesContainer" class="flex flex-wrap gap-1.5">
+              <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-500 text-[10px] font-mono">No PII detected yet</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ================= PANE 3: OUTBOUND RESTORER OUTPUT ================= -->
+      <div class="glass-panel rounded-2xl flex flex-col overflow-hidden border border-emerald-950/60 shadow-xl">
+        <div class="px-4 py-2.5 bg-slate-900/70 border-b border-slate-800 flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-200">3. Sovereign Restorer Output</h2>
+          </div>
+          
+          <!-- View toggle: Restored vs Raw LLM -->
+          <div class="flex items-center rounded-lg bg-slate-800 p-0.5 border border-slate-700 text-[9px]">
+            <button id="btnViewRestored" onclick="toggleOutputView('restored')" class="px-2 py-0.5 rounded bg-emerald-700 text-white font-medium">Restored</button>
+            <button id="btnViewRawLLM" onclick="toggleOutputView('raw')" class="px-2 py-0.5 rounded text-slate-400 hover:text-white font-medium">Raw LLM</button>
+          </div>
+        </div>
+
+        <div class="p-3.5 flex-1 flex flex-col justify-between gap-2.5">
+          
+          <!-- Restored Text Display with Glowing Green Entity Pills -->
+          <div class="flex-1 flex flex-col">
+            <div class="text-xs text-slate-400 mb-1 flex items-center justify-between">
+              <span id="outputViewLabel">Synthesized Sovereign Completion (Context Restored)</span>
+              <span id="metricTotalLatency" class="text-[10px] text-emerald-400 font-mono">-- ms</span>
+            </div>
+            <div id="outputDisplay" class="custom-scrollbar w-full flex-1 bg-slate-950/90 border border-slate-800 rounded-xl p-3 text-xs font-mono leading-relaxed overflow-y-auto text-slate-200 select-text whitespace-pre-wrap">
+              <span class="text-slate-500 italic">Apertus model synthesis will be displayed here in real time... Restored entities will be highlighted in glowing emerald.</span>
+            </div>
+          </div>
+
+          <!-- Auditor Quick Actions Bar -->
+          <div class="bg-slate-900/80 rounded-xl p-2.5 border border-slate-800 flex flex-wrap items-center justify-between gap-2 text-[10px]">
+            <div class="flex items-center space-x-1.5 text-slate-300">
+              <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-400"></i>
+              <span>Context reconstructed</span>
+            </div>
+            <div class="flex items-center space-x-2">
+              <button onclick="exportFADPCertificateHTML()" class="px-2.5 py-1 rounded-lg bg-emerald-950 hover:bg-emerald-900 text-emerald-300 border border-emerald-800/80 font-mono font-bold flex items-center gap-1 transition">
+                <i data-lucide="file-check" class="w-3 h-3"></i> HTML Certificate
+              </button>
+              <button onclick="exportFADPCertificateJSON()" class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-mono font-semibold flex items-center gap-1 transition">
+                <i data-lucide="download" class="w-3 h-3"></i> JSON SIEM
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Live Compliance Verification Strip -->
+    <div class="glass-panel rounded-xl p-3 flex flex-wrap items-center justify-between gap-3 border border-white/5">
+      <div class="flex flex-wrap items-center gap-4 text-xs font-mono">
+        <div class="flex items-center space-x-1.5">
+          <i data-lucide="scale" class="w-3.5 h-3.5 text-red-400"></i>
+          <span class="text-slate-400">FADP Art. 6:</span>
+          <span class="text-emerald-400 font-bold">STRICT_ACTIVE</span>
+        </div>
+        <div class="flex items-center space-x-1.5">
+          <i data-lucide="globe-2" class="w-3.5 h-3.5 text-blue-400"></i>
+          <span class="text-slate-400">Sovereign Soil:</span>
+          <span class="text-emerald-400 font-bold">CSCS_LUGANO_CHE</span>
+        </div>
+        <div class="flex items-center space-x-1.5">
+          <i data-lucide="shield" class="w-3.5 h-3.5 text-emerald-400"></i>
+          <span class="text-slate-400">Memory Shred:</span>
+          <span class="text-emerald-400 font-bold">CTYPES_ZEROIZED</span>
+        </div>
+        <div class="flex items-center space-x-1.5">
+          <i data-lucide="lock" class="w-3.5 h-3.5 text-amber-400"></i>
+          <span class="text-slate-400">FINMA 2018/3:</span>
+          <span class="text-emerald-400 font-bold">COMPLIANT</span>
+        </div>
+      </div>
+      <div class="text-[11px] text-slate-400 flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+        <span>Apertus SovereignGate Enterprise v2.0 • Swiss AI Initiative</span>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Interactive Code Snippet Drawer Modal -->
+  <div id="codeModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-panel w-full max-w-2xl rounded-2xl border border-slate-700 shadow-2xl overflow-hidden flex flex-col">
+      <div class="px-5 py-3.5 bg-slate-900/90 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="terminal" class="w-4 h-4 text-indigo-400"></i>
+          <h3 class="text-xs font-bold text-white uppercase tracking-wider">1-Line Drop-In OpenAI SDK Integration</h3>
+        </div>
+        <button onclick="closeCodeModal()" class="text-slate-400 hover:text-white transition">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="p-5 flex flex-col gap-3 text-xs">
+        <p class="text-slate-400 text-[11px]">
+          Replace standard OpenAI endpoints with Apertus SovereignGate. All client PII is automatically sanitized, models run on Swiss soil, and tokens are unmasked in-stream with zero data retention.
+        </p>
+
+        <div class="relative bg-slate-950 rounded-xl p-3.5 border border-slate-800 font-mono text-slate-200 text-xs custom-scrollbar overflow-x-auto">
+          <pre id="codeSnippetContent">from openai import OpenAI
+
+# 1-Line Drop-in Configuration
+client = OpenAI(
+    base_url="http://127.0.0.1:8000/v1",
+    api_key="sovereign-airlock-token"
+)
+
+# Works with standard completions, streaming, and tool calls
+response = client.chat.completions.create(
+    model="apertus-8b",
+    messages=[
+        {"role": "user", "content": "Prüfe Rentenkonto CH93 0076 2011 6238 5295 7 für AHV 756.9217.0769.85"}
+    ],
+    stream=True
+)
+
+for chunk in response:
+    print(chunk.choices[0].delta.content or "", end="")</pre>
+          <button onclick="copyCodeSnippet()" id="btnCopySnippet" class="absolute top-3 right-3 px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-[10px] font-sans font-medium flex items-center gap-1 transition">
+            <i data-lucide="copy" class="w-3 h-3"></i> Copy
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Audit Telemetry Modal -->
+  <div id="auditModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="glass-panel w-full max-w-2xl rounded-2xl border border-slate-700 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      
+      <!-- Modal Header -->
+      <div class="px-6 py-4 bg-slate-900/90 border-b border-slate-800 flex items-center justify-between">
+        <div class="flex items-center space-x-2.5">
+          <i data-lucide="file-check-2" class="w-5 h-5 text-emerald-400"></i>
+          <h3 class="text-sm font-bold text-white uppercase tracking-wider">Swiss FADP Live Regulatory Audit Telemetry</h3>
+        </div>
+        <button onclick="closeAuditModal()" class="text-slate-400 hover:text-white transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Modal Content -->
+      <div class="p-6 overflow-y-auto custom-scrollbar flex flex-col gap-5 text-xs">
+        
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="glass-card p-3 rounded-xl">
+            <div class="text-[10px] text-slate-400 uppercase">Requests Handled</div>
+            <div id="modalReqCount" class="text-base font-mono font-bold text-white mt-0.5">0</div>
+          </div>
+          <div class="glass-card p-3 rounded-xl">
+            <div class="text-[10px] text-slate-400 uppercase">Tokens Neutralized</div>
+            <div id="modalTokenCount" class="text-base font-mono font-bold text-red-400 mt-0.5">0</div>
+          </div>
+          <div class="glass-card p-3 rounded-xl">
+            <div class="text-[10px] text-slate-400 uppercase">Avg Airlock Speed</div>
+            <div id="modalAvgLatency" class="text-base font-mono font-bold text-cyan-400 mt-0.5">0.00 ms</div>
+          </div>
+          <div class="glass-card p-3 rounded-xl">
+            <div class="text-[10px] text-slate-400 uppercase">RAM Zeroization</div>
+            <div class="text-base font-mono font-bold text-emerald-400 mt-0.5">ctypes.memset</div>
+          </div>
+        </div>
+
+        <!-- Breakdown by category -->
+        <div>
+          <h4 class="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Neutralized Swiss PII by Classification</h4>
+          <div id="modalCategoryList" class="grid grid-cols-1 sm:grid-cols-2 gap-2 font-mono">
+          </div>
+        </div>
+
+        <!-- Compliance Attestation -->
+        <div class="border border-slate-800 rounded-xl p-4 bg-slate-900/60 flex flex-col gap-2">
+          <div class="font-bold text-slate-200 flex items-center justify-between">
+            <span>Regulatory Attestation Status</span>
+            <span class="text-emerald-400 font-mono">100% COMPLIANT</span>
+          </div>
+          <ul class="space-y-1.5 text-slate-400 text-[11px]">
+            <li class="flex items-center gap-2">
+              <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i>
+              <span><strong>FADP Art. 6:</strong> Data minimization and proportionality strictly enforced.</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i>
+              <span><strong>FADP Art. 8:</strong> Compute restricted to Swiss sovereign nodes (CSCS Lugano).</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i>
+              <span><strong>FADP Art. 19:</strong> Zero retention; token vaults are ephemeral and volatile in-memory.</span>
+            </li>
+            <li class="flex items-center gap-2">
+              <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i>
+              <span><strong>FINMA Circular 2018/3:</strong> Banking customer identity shielded before inference.</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="px-6 py-3 bg-slate-900/90 border-t border-slate-800 flex justify-between items-center">
+        <button onclick="exportFADPCertificateHTML()" class="px-4 py-1.5 rounded-lg bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center gap-1.5">
+          <i data-lucide="award" class="w-3.5 h-3.5"></i> Export Official Certificate
+        </button>
+        <button onclick="closeAuditModal()" class="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition">
+          Close
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Interactive Workbench Script -->
+  <script>
+    let currentRawLLMOutput = "";
+    let currentRestoredOutput = "";
+    let latestCertificateId = "";
+
+    // Swiss Industry Presets
+    const INDUSTRY_PRESETS = {
+      banking: `Dringender Zahlungsauftrag gemäss FINMA-Richtlinien:\nBitte autorisieren Sie eine Überweisung über CHF 450'000 von unserem Firmenkonto mit der IBAN CH93 0076 2011 6238 5295 7 zu Gunsten des Portfolios bei der Zürcher Kantonalbank.\nZuständiger Compliance Officer: compliance@zkb.ch. Bestätigung und Risikoprüfung erforderlich.`,
+      healthcare: `Patientenaufnahme & Klinischer Dossier-Auszug (Vertraulich Art. 6 revDSG):\nBehandelnder Arzt: Dr. med. Beat Fontana am Universitätsspital Zürich (USZ).\nPatient: Lukas Weber, AHV-Versichertennummer: 756.9217.0769.85.\nNotfallkontakt: Frau Sarah Keller, Telefon: +41 79 123 45 67, E-Mail: lukas.weber@hin.ch.\nDiagnose: Kardiovaskuläre Nachkontrolle. Bitte erstellen Sie eine Zusammenfassung der empfohlenen Medikation.`,
+      tax: `Eidgenössische Steuerverwaltung (ESTV) - Mehrwertsteuer-Revision:\nVerwaltungsverfahren: Kanton ZH Ref: 2026/8849-B.\nErbitte eine Analyse der Vorsteuerabzüge und des MWST-Abrechnungsstatus für die eingetragene Gesellschaft mit der Unternehmens-Identifikationsnummer CHE-109.876.543 MWST.\nKontakt für Steuerprüfung: tax-audit@swiss-consulting.ch, Telefon: +41 22 819 20 00.`
+    };
+
+    function applyIndustryPreset(presetKey) {
+      if (INDUSTRY_PRESETS[presetKey]) {
+        document.getElementById('inputPrompt').value = INDUSTRY_PRESETS[presetKey];
+      }
+    }
+
+    function onModelChange() {
+      const model = document.getElementById('selectModel').value;
+      const headerStatus = document.getElementById('headerNodeStatus');
+      if (model === 'hf-fallback') {
+        headerStatus.innerHTML = '<span class="inline-block w-1.5 h-1.5 rounded-full bg-amber-400"></span> HF Router Fallback';
+        headerStatus.className = "text-amber-400 flex items-center gap-1 font-mono text-[11px]";
+      } else {
+        headerStatus.innerHTML = '<span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span> CSCS Lugano Active';
+        headerStatus.className = "text-emerald-400 flex items-center gap-1 font-mono text-[11px]";
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      applyIndustryPreset('banking');
+      refreshAuditMetrics();
+    });
+
+    function toggleOutputView(view) {
+      const btnRestored = document.getElementById('btnViewRestored');
+      const btnRaw = document.getElementById('btnViewRawLLM');
+      const display = document.getElementById('outputDisplay');
+      const label = document.getElementById('outputViewLabel');
+
+      if (view === 'restored') {
+        btnRestored.className = "px-2 py-0.5 rounded bg-emerald-700 text-white font-medium";
+        btnRaw.className = "px-2 py-0.5 rounded text-slate-400 hover:text-white font-medium";
+        display.innerHTML = highlightTokens(currentRestoredOutput, false);
+        label.innerText = "Synthesized Sovereign Completion (Context Restored)";
+      } else {
+        btnRaw.className = "px-2 py-0.5 rounded bg-amber-700 text-white font-medium";
+        btnRestored.className = "px-2 py-0.5 rounded text-slate-400 hover:text-white font-medium";
+        display.innerHTML = highlightTokens(currentRawLLMOutput, true);
+        label.innerText = "Raw Unrestored LLM Output (With Surrogate Tokens)";
+      }
+    }
+
+    // Live Token Diff Highlighting (Amber for surrogate tokens, Emerald for restored entities)
+    function highlightTokens(text, isToken) {
+      if (!text) return '<span class="text-slate-500 italic">No output received yet...</span>';
+      return escapeHtml(text).replace(/(&lt;[A-Z_]+_\d+&gt;|<[A-Z_]+_\d+>)/g, (match) => {
+        return `<span class="inline-block px-1.5 py-0.5 rounded badge-pii-amber font-mono text-[11px] font-bold shadow-sm">${match}</span>`;
+      });
+    }
+
+    function escapeHtml(string) {
+      return String(string).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // Transmit Handler (SSE Stream or standard)
+    async function transmitAirlock() {
+      const prompt = document.getElementById('inputPrompt').value.trim();
+      if (!prompt) {
+        alert("Please enter a prompt or choose an industry preset.");
+        return;
+      }
+
+      const model = document.getElementById('selectModel').value;
+      const isStreaming = document.getElementById('checkStreaming').checked;
+      const btnTransmit = document.getElementById('btnTransmit');
+
+      btnTransmit.disabled = true;
+      btnTransmit.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Airlock Processing...</span>`;
+      lucide.createIcons();
+
+      document.getElementById('sanitizedDisplay').innerHTML = `<span class="text-cyan-400 animate-pulse">Running Inbound Sanitizer Regex Air-Gap...</span>`;
+      document.getElementById('outputDisplay').innerHTML = `<span class="text-amber-400 animate-pulse">Connecting to sovereign Apertus backend...</span>`;
+
+      currentRawLLMOutput = "";
+      currentRestoredOutput = "";
+
+      if (isStreaming) {
+        await handleStreamingTransmit(prompt, model);
+      } else {
+        await handleStandardTransmit(prompt, model);
+      }
+
+      btnTransmit.disabled = false;
+      btnTransmit.innerHTML = `<i data-lucide="shield" class="w-4 h-4"></i><span>Transmit Sovereign Airlock</span>`;
+      lucide.createIcons();
+    }
+
+    async function handleStreamingTransmit(prompt, model) {
+      try {
+        const response = await fetch('/api/airlock/stream', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prompt: prompt,
+            model: model,
+            temperature: 0.7,
+            max_tokens: 512,
+            force_fallback: model === 'hf-fallback'
+          })
+        });
+
+        if (response.status === 403) {
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(errData.reason || "Adversarial prompt injection attempt detected");
+        }
+
+        if (!response.ok) {
+          throw new Error(`Server returned ${response.status}`);
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        document.getElementById('outputDisplay').innerHTML = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n\n');
+          buffer = lines.pop();
+
+          for (const block of lines) {
+            if (!block.trim()) continue;
+            const linesInBlock = block.split('\n');
+            let eventType = 'message';
+            let eventData = '';
+
+            for (const line of linesInBlock) {
+              if (line.startsWith('event: ')) {
+                eventType = line.slice(7).trim();
+              } else if (line.startsWith('data: ')) {
+                eventData = line.slice(6).trim();
+              }
+            }
+
+            if (!eventData) continue;
+            try {
+              const parsed = JSON.parse(eventData);
+
+              if (eventType === 'inbound') {
+                document.getElementById('sanitizedDisplay').innerHTML = highlightTokens(parsed.sanitized_prompt, true);
+                document.getElementById('badgeRedactedCount').innerText = `${parsed.audit.total_redacted} Neutralized`;
+                document.getElementById('labelTotalRedacted').innerText = `Total: ${parsed.audit.total_redacted}`;
+                updateTelemetryBar(parsed.audit);
+                updateCategoryBadges(parsed.audit.redaction_counts);
+              } else if (eventType === 'token') {
+                currentRawLLMOutput += parsed.raw_chunk || '';
+                currentRestoredOutput += parsed.restored_chunk || '';
+                document.getElementById('outputDisplay').innerHTML = highlightTokens(currentRestoredOutput, false);
+                document.getElementById('outputDisplay').scrollTop = document.getElementById('outputDisplay').scrollHeight;
+              } else if (eventType === 'complete') {
+                latestCertificateId = parsed.certificate_id;
+                document.getElementById('metricTotalLatency').innerText = `${parsed.total_latency_ms.toFixed(2)} ms total`;
+                refreshAuditMetrics();
+              }
+            } catch (e) {
+            }
+          }
+        }
+      } catch (err) {
+        document.getElementById('outputDisplay').innerHTML = `<div class="p-3 rounded-xl bg-red-950/80 border border-red-800 text-red-300 font-bold flex items-center gap-2"><i data-lucide="shield-alert" class="w-5 h-5 text-red-400"></i><span>SOVEREIGN GUARDRAIL BLOCKED: ${escapeHtml(err.message)}</span></div>`;
+        lucide.createIcons();
+      }
+    }
+
+    async function handleStandardTransmit(prompt, model) {
+      try {
+        const res = await fetch('/api/airlock/process', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prompt: prompt,
+            model: model,
+            temperature: 0.7,
+            max_tokens: 512,
+            force_fallback: model === 'hf-fallback'
+          })
+        });
+
+        if (res.status === 403) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.reason || "Adversarial prompt injection attempt detected");
+        }
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.detail || `Server error: ${res.status}`);
+        }
+
+        const data = await res.json();
+        latestCertificateId = data.certificate_id;
+
+        document.getElementById('sanitizedDisplay').innerHTML = highlightTokens(data.sanitized_prompt, true);
+        document.getElementById('badgeRedactedCount').innerText = `${data.audit.total_redacted} Neutralized`;
+        document.getElementById('labelTotalRedacted').innerText = `Total: ${data.audit.total_redacted}`;
+        updateCategoryBadges(data.audit.redaction_counts);
+        updateTelemetryBar(data.audit);
+
+        currentRawLLMOutput = data.raw_llm_output || "";
+        currentRestoredOutput = data.restored_output || "";
+        toggleOutputView('restored');
+
+        document.getElementById('metricTotalLatency').innerText = `${data.total_latency_ms.toFixed(2)} ms total`;
+        refreshAuditMetrics();
+
+      } catch (err) {
+        document.getElementById('outputDisplay').innerHTML = `<div class="p-3 rounded-xl bg-red-950/80 border border-red-800 text-red-300 font-bold flex items-center gap-2"><i data-lucide="shield-alert" class="w-5 h-5 text-red-400"></i><span>SOVEREIGN GUARDRAIL BLOCKED: ${escapeHtml(err.message)}</span></div>`;
+        lucide.createIcons();
+      }
+    }
+
+    function updateTelemetryBar(audit) {
+      const ms = audit.latency_ms || 0;
+      const us = audit.latency_us || Math.round(ms * 1000);
+      document.getElementById('telemetryLatency').innerText = `${ms.toFixed(2)} ms`;
+      document.getElementById('telemetryMicros').innerText = `(${us} µs)`;
+
+      const badge = document.getElementById('telemetryImpactBadge');
+      if (ms < 1.5) {
+        badge.className = "text-[9px] font-semibold px-2 py-0.5 rounded-full bg-emerald-950/80 text-emerald-300 border border-emerald-800/60";
+        badge.innerText = "Zero Impact (< 1.5 ms)";
+      } else {
+        badge.className = "text-[9px] font-semibold px-2 py-0.5 rounded-full bg-amber-950/80 text-amber-300 border border-amber-800/60";
+        badge.innerText = "Standard Processing";
+      }
+    }
+
+    function updateCategoryBadges(counts) {
+      const badgesContainer = document.getElementById('piiBadgesContainer');
+      badgesContainer.innerHTML = '';
+      let hasBadges = false;
+      for (const [cat, count] of Object.entries(counts || {})) {
+        if (count > 0) {
+          hasBadges = true;
+          const badge = document.createElement('span');
+          badge.className = "px-2 py-0.5 rounded text-[10px] font-mono font-medium badge-pii-amber";
+          badge.innerText = `${cat}: ${count}`;
+          badgesContainer.appendChild(badge);
+        }
+      }
+      if (!hasBadges) {
+        badgesContainer.innerHTML = '<span class="px-2 py-0.5 rounded bg-emerald-950/60 border border-emerald-800/40 text-emerald-300 text-[10px] font-mono">No Swiss PII Detected (Safe Pass)</span>';
+      }
+    }
+
+    // Auditor Quick Actions: Export HTML Certificate
+    async function exportFADPCertificateHTML() {
+      await ensureCertificateReady();
+      if (latestCertificateId) {
+        window.open(`/api/audit/certificate/${latestCertificateId}?format=html`, '_blank');
+      }
+    }
+
+    // Auditor Quick Actions: Export JSON SIEM Attestation
+    async function exportFADPCertificateJSON() {
+      await ensureCertificateReady();
+      if (latestCertificateId) {
+        window.open(`/api/audit/certificate/${latestCertificateId}`, '_blank');
+      }
+    }
+
+    async function ensureCertificateReady() {
+      if (!latestCertificateId) {
+        const prompt = document.getElementById('inputPrompt').value.trim();
+        if (!prompt) {
+          alert("Please enter a prompt or execute an airlock query first.");
+          return;
+        }
+        try {
+          const res = await fetch('/api/audit/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sample_text: prompt })
+          });
+          const data = await res.json();
+          latestCertificateId = data.certificate_id;
+        } catch (e) {
+          alert("Failed to generate compliance certificate: " + e.message);
+        }
+      }
+    }
+
+    // Code Snippet Drawer Controls
+    function openCodeModal() {
+      document.getElementById('codeModal').classList.remove('hidden');
+    }
+
+    function closeCodeModal() {
+      document.getElementById('codeModal').classList.add('hidden');
+    }
+
+    function copyCodeSnippet() {
+      const code = document.getElementById('codeSnippetContent').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        const btn = document.getElementById('btnCopySnippet');
+        btn.innerHTML = `<i data-lucide="check" class="w-3 h-3 text-emerald-400"></i> Copied!`;
+        lucide.createIcons();
+        setTimeout(() => {
+          btn.innerHTML = `<i data-lucide="copy" class="w-3 h-3"></i> Copy`;
+          lucide.createIcons();
+        }, 2000);
+      });
+    }
+
+    // Refresh Audit Modal data
+    async function refreshAuditMetrics() {
+      try {
+        const res = await fetch('/api/audit');
+        if (!res.ok) return;
+        const data = await res.json();
+        
+        document.getElementById('modalReqCount').innerText = data.telemetry.requests_processed;
+        document.getElementById('modalTokenCount').innerText = data.telemetry.pii_tokens_neutralized;
+        document.getElementById('modalAvgLatency').innerText = `${data.telemetry.avg_airlock_latency_ms} ms`;
+
+        const catContainer = document.getElementById('modalCategoryList');
+        catContainer.innerHTML = '';
+        for (const [cat, count] of Object.entries(data.telemetry.category_breakdown)) {
+          const item = document.createElement('div');
+          item.className = "flex items-center justify-between p-2 rounded-lg bg-slate-800/60 border border-slate-700/60";
+          item.innerHTML = `<span class="text-slate-300">${cat}:</span><span class="text-red-300 font-bold">${count}</span>`;
+          catContainer.appendChild(item);
+        }
+      } catch (e) {
+      }
+    }
+
+    document.getElementById('btnOpenAuditModal').addEventListener('click', () => {
+      refreshAuditMetrics();
+      document.getElementById('auditModal').classList.remove('hidden');
+    });
+
+    function closeAuditModal() {
+      document.getElementById('auditModal').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
